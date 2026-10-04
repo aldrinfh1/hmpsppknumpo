@@ -25,7 +25,8 @@
             <div class="btn">
                 <button class="btn0" onclick="document.location='/'">
                     | aldrinfh1.github.io
-                </button>              
+                </button>
+                
             </div>
         </header>
 
@@ -34,19 +35,19 @@
             <div class="jdl">
                 <h1 class="jdl-a">Apakah Aku Lolos?</h1>
                 <p class="deskr" id="deskripsi">
-                    Masukkan Nama lengkap atau ID kamu untuk melihat hasil seleksi.
+                    Masukkan Nama Lengkap atau NIM atau Nama Singkat kamu untuk melihat hasil seleksi.
                 </p>
             </div>
 
             <div class="jdw">
                 <form class="search" id="formCari" autocomplete="off">
-                    <label for="kueri" class="search-label">Nama / ID</label>
+                    <label for="kueri" class="search-label"> Ketik Nama Lengkap / NIM / Nama Singkat</label>
                     <div class="search-row">
                         <input
                             type="text"
                             id="kueri"
                             class="search-input"
-                            placeholder="Contoh: 2026001 atau sebagian nama"
+                            placeholder="Contoh: 2026001 atau Nama Lengkap atau Nama Singkat"
                             maxlength="80"
                             required
                         />
@@ -97,8 +98,9 @@
                     kartu.appendChild(buat("h2", "kartu-nama", p.nama));
 
                     const tabel = buat("table", "kartu-tabel");
-                    const baris = [["ID", p.id], ["Status", "Lolos"]];
-                    if (p.divisi) baris.push(["Divisi", p.divisi]);
+                    const baris = [["NIM", p.id], ["Status", "Lolos"]];
+                    if (p.posisi) baris.push(["Posisi", p.posisi]);
+                    if (p.kelas) baris.push(["Kelas", p.kelas]);
                     baris.forEach(([k, v]) => {
                         const tr = document.createElement("tr");
                         tr.appendChild(buat("th", "", k));
@@ -114,7 +116,7 @@
                 hasil.replaceChildren();
                 const kartu = buat("div", "kartu tidak");
                 kartu.appendChild(buat("div", "badge badge-tidak", "BELUM LOLOS"));
-                kartu.appendChild(buat("h2", "kartu-nama", "Data tidak ditemukan"));
+                kartu.appendChild(buat("h2", "kartu-nama", "Jangan putus asa dan tetap semangat!"));
                 kartu.appendChild(
                     buat(
                         "p",
