@@ -22,7 +22,7 @@ const PESERTA_LOLOS = [
 
     // Organisasi dan Perkaderan
     { id: "26312354", nama: "Laudya Amaradhani Eka Saputri", posisi: "Organisasi dan Perkaderan"},
-    { id: "26312361", nama: "Muhammad Hassan Al Banna", posisi: "Organisasi dan Perkaderan"},
+    { id: "26312361", nama: "M. Hassan Al Banna", posisi: "Organisasi dan Perkaderan"},
     { id: "26312378", nama: "Muhammad Ramdan", posisi: "Organisasi dan Perkaderan"},
     { id: "26312381", nama: "Verina Lutfiah Wimala", posisi: "Organisasi dan Perkaderan"},
 
