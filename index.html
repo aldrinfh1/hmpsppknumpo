@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Apakah Aku Lolos?</title>
+        <link rel="stylesheet" href="styles.css" />
+        <meta property="og:title" content="Apakah Aku Lolos?" />
+        <meta
+            property="og:description"
+            content="Cek hasil seleksi anggota dengan memasukkan Nama atau ID."
+        />
+        <meta property="og:url" content="https://aldrinfh1.github.io/daftartugas" />
+        <meta property="og:type" content="website" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <script src="data.js"></script>
+    </head>
+    <body>
+        <header class="headerori">
+            <div class="btn">
+                <button class="btn0" onclick="document.location='/'">
+                    | aldrinfh1.github.io
+                </button>
+                <button class="btn1" onclick="document.location='/'">Home</button>
+                <button
+                    class="btn1"
+                    id="daftartugas"
+                    onclick="document.location='kaumpo/kalender'"
+                >
+                    Kalender
+                </button>
+                <button
+                    class="btn1"
+                    id="rwy"
+                    onclick="document.location='/about'"
+                >
+                    About
+                </button>
+            </div>
+        </header>
+
+        <div class="realbody">
+            <div class="bgr"></div>
+            <div class="jdl">
+                <h1 class="jdl-a">Apakah Aku Lolos?</h1>
+                <p class="deskr" id="deskripsi">
+                    Masukkan Nama lengkap atau ID kamu untuk melihat hasil seleksi.
+                </p>
+            </div>
+
+            <div class="jdw">
+                <form class="search" id="formCari" autocomplete="off">
+                    <label for="kueri" class="search-label">Nama / ID</label>
+                    <div class="search-row">
+                        <input
+                            type="text"
+                            id="kueri"
+                            class="search-input"
+                            placeholder="Contoh: 2026001 atau sebagian nama"
+                            maxlength="80"
+                            required
+                        />
+                        <button type="submit" class="search-btn" id="tombolCari">
+                            Cari
+                        </button>
+                    </div>
+                </form>
+
+                <div id="hasil" class="hasil" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <footer class="ftr">
+            <p class="ftrtext">Update 0.005a.0.r1 (Alpha)</p>
+        </footer>
+
+        <script>
+            const form = document.getElementById("formCari");
+            const input = document.getElementById("kueri");
+            const tombol = document.getElementById("tombolCari");
+            const hasil = document.getElementById("hasil");
+            const deskripsi = document.getElementById("deskripsi");
+            const MIN_HURUF = 3; // ubah angka ini untuk mengatur panjang minimum pencarian
+
+            // Samakan huruf besar/kecil, spasi ganda, dan aksen agar pencarian lebih toleran
+            function normalisasi(teks) {
+                return teks
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase()
+                    .replace(/\s+/g, " ")
+                    .trim();
+            }
+
+            function buat(tag, kelas, teks) {
+                const el = document.createElement(tag);
+                if (kelas) el.className = kelas;
+                if (teks !== undefined) el.textContent = teks;
+                return el;
+            }
+
+            function tampilkanLolos(daftar) {
+                hasil.replaceChildren();
+                daftar.forEach((p) => {
+                    const kartu = buat("div", "kartu lolos");
+                    kartu.appendChild(buat("div", "badge badge-lolos", "SELAMAT, KAMU LOLOS"));
+                    kartu.appendChild(buat("h2", "kartu-nama", p.nama));
+
+                    const tabel = buat("table", "kartu-tabel");
+                    const baris = [["ID", p.id], ["Status", "Lolos"]];
+                    if (p.divisi) baris.push(["Divisi", p.divisi]);
+                    baris.forEach(([k, v]) => {
+                        const tr = document.createElement("tr");
+                        tr.appendChild(buat("th", "", k));
+                        tr.appendChild(buat("td", "", v));
+                        tabel.appendChild(tr);
+                    });
+                    kartu.appendChild(tabel);
+                    hasil.appendChild(kartu);
+                });
+            }
+
+            function tampilkanTidakLolos(kueri) {
+                hasil.replaceChildren();
+                const kartu = buat("div", "kartu tidak");
+                kartu.appendChild(buat("div", "badge badge-tidak", "BELUM LOLOS"));
+                kartu.appendChild(buat("h2", "kartu-nama", "Data tidak ditemukan"));
+                kartu.appendChild(
+                    buat(
+                        "p",
+                        "kartu-ket",
+                        "\"" + kueri + "\" tidak ada dalam daftar peserta yang lolos. " +
+                        "Pastikan penulisan sudah benar, lalu coba lagi. " +
+                        "Tetap semangat dan terima kasih sudah mendaftar!"
+                    )
+                );
+                hasil.appendChild(kartu);
+            }
+
+            function sudahDibuka() {
+                if (!KONFIG.bukaPada) return true;
+                return Date.now() >= new Date(KONFIG.bukaPada).getTime();
+            }
+
+            function kunciSampaiWaktunya() {
+                const waktu = new Date(KONFIG.bukaPada).toLocaleString("id-ID", {
+                    dateStyle: "full",
+                    timeStyle: "short",
+                });
+                deskripsi.textContent = "Pengumuman dibuka pada " + waktu + " (waktu perangkatmu).";
+                input.disabled = true;
+                tombol.disabled = true;
+
+                const timer = setInterval(() => {
+                    if (sudahDibuka()) {
+                        clearInterval(timer);
+                        deskripsi.textContent =
+                            "Masukkan Nama lengkap atau ID kamu untuk melihat hasil seleksi.";
+                        input.disabled = false;
+                        tombol.disabled = false;
+                    }
+                }, 1000);
+            }
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                if (!sudahDibuka()) return;
+
+                const mentah = input.value.trim();
+                const kueri = normalisasi(mentah);
+                if (!kueri) return;
+
+                // Nama atau ID yang terlalu pendek ditolak agar tidak menampilkan banyak orang sekaligus
+                if (kueri.replace(/ /g, "").length < MIN_HURUF) {
+                    hasil.replaceChildren();
+                    const kartu = buat("div", "kartu tidak");
+                    kartu.appendChild(
+                        buat(
+                            "p",
+                            "kartu-ket",
+                            "Ketik minimal " + MIN_HURUF + " karakter dari Nama atau ID kamu."
+                        )
+                    );
+                    hasil.appendChild(kartu);
+                    return;
+                }
+
+                // ID harus persis sama. Nama cocok jika SEMUA kata yang diketik ada di dalam nama
+                // (urutan bebas, boleh sebagian kata).
+                const kata = kueri.split(" ");
+                const ketemu = PESERTA_LOLOS.filter((p) => {
+                    if (normalisasi(p.id) === kueri) return true;
+                    const nama = normalisasi(p.nama);
+                    return kata.every((k) => nama.includes(k));
+                });
+
+                if (ketemu.length) tampilkanLolos(ketemu);
+                else tampilkanTidakLolos(mentah);
+            });
+
+            if (!sudahDibuka()) kunciSampaiWaktunya();
+        </script>
+    </body>
+</html>
