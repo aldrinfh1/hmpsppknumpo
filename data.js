@@ -13,7 +13,7 @@ const KONFIG = {
 
 const PESERTA_LOLOS = [
     { id: "25312332", nama: "Aldrin Fahrul Hidayat", divisi: "Medkom" },
-    { id: "2026002", nama: "Contoh Dua", divisi: "Acara" },
+    { id: "26312342", nama: "Paijo bin Paijaono", divisi: "Acara" },
     { id: "2026003", nama: "Contoh Tiga", divisi: "Publikasi" },
     // Tambahkan baris baru di sini.
     // "divisi" boleh dihapus kalau tidak diperlukan.
