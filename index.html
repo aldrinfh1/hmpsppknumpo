@@ -139,7 +139,7 @@
 
                     const tabel = buat("table", "kartu-tabel");
                     const baris = [["NIM", p.id], ["Status", "Lolos"]];
-                    if (p.posisi) baris.push(["Posisi", p.posisi]);
+                    if (p.posisi) baris.push(["Divisi", p.posisi]);
                     if (p.kelas) baris.push(["Kelas", p.kelas]);
                     baris.forEach(([k, v]) => {
                         const tr = document.createElement("tr");
