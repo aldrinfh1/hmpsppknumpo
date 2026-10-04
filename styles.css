@@ -22,7 +22,7 @@ p {
 }
 
 .btn {
-    margin-top: 20px;
+    margin-top: 10px;
     display: grid;
     width: 90%;
     margin-right: 5%;
@@ -34,9 +34,9 @@ p {
     border: none;
     color: #FBFFF4;
     font-weight: bold;
-    padding: 15px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+    padding: 0px;
+    margin-bottom: 0px;
+    margin-top: 2px;
     font-size: 1.2em;
     transition-duration: 0.1s;
     font-family: inherit;
@@ -72,7 +72,7 @@ p {
 
 /* ---------- Layout utama ---------- */
 .realbody {
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 20px;
     background-color: #FBFFF4;
     border: 1px solid #090a07;
@@ -82,7 +82,7 @@ p {
 .bgr {
     background-color: #2e3625;
     height: 150px;
-    padding: 30px;
+    padding: 10px;
 }
 
 .jdl {
@@ -95,15 +95,14 @@ p {
 }
 
 .jdl-a {
-    margin-bottom: 10px;
-    margin-top: 20px;
+    margin: 10px 10px 0px 10px;
     text-align: center;
+    font-size: 1.5em;
 }
 
 .deskr {
     text-align: center;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin: 0px;
 }
 
 .jdw {
