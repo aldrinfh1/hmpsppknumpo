@@ -40,7 +40,7 @@
                 <h1 class="h1-apakah">Apakah Aku Lolos?</h1>
             </div>
                     
-                    <label for="kueri" class="search-label">Masukkan NIM atau Nama Lengkap atau Nama Singkat kamu untuk melihat hasil seleksi.</label>
+                    <label for="kueri" id="deskripsi" class="search-label">Masukkan NIM atau Nama Lengkap atau Nama Singkat kamu untuk melihat hasil seleksi.</label>
                     <div class="search-row">
                         <input
                             type="text"
@@ -70,16 +70,57 @@
             const tombol = document.getElementById("tombolCari");
             const hasil = document.getElementById("hasil");
             const deskripsi = document.getElementById("deskripsi");
-            const MIN_HURUF = 3; // ubah angka ini untuk mengatur panjang minimum pencarian
+            const TEKS_AWAL = deskripsi.textContent;
+            const MIN_HURUF = 3; // panjang minimum pencarian
 
-            // Samakan huruf besar/kecil, spasi ganda, dan aksen agar pencarian lebih toleran
+            // Singkatan/ejaan lain yang disamakan. Tambahkan sendiri jika perlu.
+            const SINGKATAN = {
+                m: "muhammad", muh: "muhammad", moh: "muhammad", mohd: "muhammad",
+                moch: "muhammad", mochammad: "muhammad", mohammad: "muhammad",
+                mohamad: "muhammad", muhamad: "muhammad", muhammmad: "muhammad",
+            };
+
+            // Huruf kecil, tanpa aksen, tanda baca dibuang ("M." jadi "m", "Asma'ul" jadi "asmaul")
             function normalisasi(teks) {
                 return teks
                     .normalize("NFD")
                     .replace(/[\u0300-\u036f]/g, "")
                     .toLowerCase()
-                    .replace(/\s+/g, " ")
+                    .replace(/['`\u2019]/g, "")
+                    .replace(/[^a-z0-9]+/g, " ")
                     .trim();
+            }
+
+            // Penyamaan ejaan yang aman: dipakai di data DAN di yang diketik, jadi hasilnya konsisten.
+            // "Hassan" dan "Hasan" sama, "Rizky" dan "Rizki" sama, "Wullan" dan "Wulan" sama.
+            function samakanEjaan(kata) {
+                return kata
+                    .replace(/oe/g, "u")
+                    .replace(/dj/g, "j")
+                    .replace(/tj/g, "c")
+                    .replace(/kh/g, "h")
+                    .replace(/y/g, "i")
+                    .replace(/([a-z])\1+/g, "$1"); // huruf dobel jadi satu (angka tidak diubah)
+            }
+
+            // Pecah jadi kata-kata, samakan singkatan (m -> muhammad), lalu samakan ejaan
+            function pecah(teks) {
+                return normalisasi(teks)
+                    .split(" ")
+                    .filter(Boolean)
+                    .map((t) => samakanEjaan(SINGKATAN[t] || t));
+            }
+
+            // Siapkan indeks sekali saja. Field "alias" (array nama lain) bersifat opsional di data.js
+            const INDEKS = PESERTA_LOLOS.map((p) => ({
+                p,
+                id: normalisasi(p.id),
+                varian: [p.nama].concat(p.alias || []).map(pecah),
+            }));
+
+            // Semua kata yang diketik ada di dalam nama (urutan bebas, boleh sebagian kata)
+            function cocokPersis(kataKueri, kataNama) {
+                return kataKueri.every((k) => kataNama.some((t) => t.includes(k)));
             }
 
             function buat(tag, kelas, teks) {
@@ -111,20 +152,33 @@
                 });
             }
 
-            function tampilkanTidakLolos(kueri) {
+            function tampilkanTidakLolos(kueri, berupaNIM) {
                 hasil.replaceChildren();
                 const kartu = buat("div", "kartu tidak");
                 kartu.appendChild(buat("div", "badge badge-tidak", "BELUM LOLOS"));
                 kartu.appendChild(buat("h2", "kartu-nama", "Jangan putus asa dan tetap semangat!"));
+
+                // Saran disesuaikan dengan apa yang diketik: NIM atau nama
+                const saran = berupaNIM
+                    ? "Pastikan NIM sudah benar, lalu coba lagi. "
+                    : "Pastikan penulisan sudah benar, lalu coba lagi. Jika ragu dengan penulisan nama, cari memakai NIM. ";
+
                 kartu.appendChild(
                     buat(
                         "p",
                         "kartu-ket",
                         "\"" + kueri + "\" tidak ada dalam daftar peserta yang lolos. " +
-                        "Pastikan penulisan sudah benar, lalu coba lagi. " +
+                        saran +
                         "Jangan putus asa, tetap semangat dan terima kasih sudah mendaftar."
                     )
                 );
+                hasil.appendChild(kartu);
+            }
+
+            function tampilkanPesan(teks) {
+                hasil.replaceChildren();
+                const kartu = buat("div", "kartu tidak");
+                kartu.appendChild(buat("p", "kartu-ket", teks));
                 hasil.appendChild(kartu);
             }
 
@@ -145,48 +199,43 @@
                 const timer = setInterval(() => {
                     if (sudahDibuka()) {
                         clearInterval(timer);
-                        deskripsi.textContent =
-                            "Masukkan Nama lengkap atau ID kamu untuk melihat hasil seleksi.";
+                        deskripsi.textContent = TEKS_AWAL;
                         input.disabled = false;
                         tombol.disabled = false;
                     }
                 }, 1000);
             }
 
-            form.addEventListener("submit", (e) => {
-                e.preventDefault();
+            function cari(mentah) {
                 if (!sudahDibuka()) return;
 
-                const mentah = input.value.trim();
+                mentah = mentah.trim();
                 const kueri = normalisasi(mentah);
                 if (!kueri) return;
 
-                // Nama atau ID yang terlalu pendek ditolak agar tidak menampilkan banyak orang sekaligus
+                // Terlalu pendek ditolak agar tidak menampilkan banyak orang sekaligus
                 if (kueri.replace(/ /g, "").length < MIN_HURUF) {
-                    hasil.replaceChildren();
-                    const kartu = buat("div", "kartu tidak");
-                    kartu.appendChild(
-                        buat(
-                            "p",
-                            "kartu-ket",
-                            "Ketik minimal " + MIN_HURUF + " karakter dari Nama atau ID kamu."
-                        )
-                    );
-                    hasil.appendChild(kartu);
+                    tampilkanPesan("Ketik minimal " + MIN_HURUF + " karakter dari Nama atau NIM kamu.");
                     return;
                 }
 
-                // ID harus persis sama. Nama cocok jika SEMUA kata yang diketik ada di dalam nama
-                // (urutan bebas, boleh sebagian kata).
-                const kata = kueri.split(" ");
-                const ketemu = PESERTA_LOLOS.filter((p) => {
-                    if (normalisasi(p.id) === kueri) return true;
-                    const nama = normalisasi(p.nama);
-                    return kata.every((k) => nama.includes(k));
-                });
+                const kata = pecah(mentah);
+                
+                // NIM persis, atau semua kata yang diketik cocok dengan nama/alias
+                const ketemu = INDEKS.filter(
+                    (x) => x.id === kueri || x.varian.some((v) => cocokPersis(kata, v))
+                );
+                if (ketemu.length) {
+                    tampilkanLolos(ketemu.map((x) => x.p));
+                    return;
+                }
 
-                if (ketemu.length) tampilkanLolos(ketemu);
-                else tampilkanTidakLolos(mentah);
+                tampilkanTidakLolos(mentah, /^\d+$/.test(kueri));
+            }
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                cari(input.value);
             });
 
             if (!sudahDibuka()) kunciSampaiWaktunya();
