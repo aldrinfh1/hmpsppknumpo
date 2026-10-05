@@ -7,12 +7,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const tasks = [
 
         // ===== KEGIATAN =====
+        
+        {
+            title: "PPT TM",
+            description: "<b>Perlengkapan</b><p style='margin-top:10px;'><b>Kamis, 8 Oktober 2026</b></p>",
+            deadline: "Oct 8, 2026 23:59:59",
+            link: ""
+        },
         {
             title: "Coming Soon",
             description: "<b>Kegiatan</b> | Postingan<p style='margin-top:10px;'><b>Jumat, 9 Oktober 2026</b></p>",
             deadline: "Oct 9, 2026 23:59:59",
             link: ""
         },
+        
         {
             title: "H-? → H-? → H-?",
             description: "<b>Kegiatan</b> | Story<p style='margin-top:10px;'><b>Jadwal menyusul</b></p>",
@@ -83,12 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
             deadline: "Oct 18, 2026 23:59:59",
             link: ""
         },
-        {
-            title: "PPT TM",
-            description: "<b>Perlengkapan</b><p style='margin-top:10px;'><b>Kamis, 8 Oktober 2026</b></p>",
-            deadline: "Oct 8, 2026 23:59:59",
-            link: ""
-        },
+        
         {
             title: "Sertifikat Panitia & Pemateri",
             description: "<b>Perlengkapan</b><p style='margin-top:10px;'><b>23 Oktober 2026</b></p>",
